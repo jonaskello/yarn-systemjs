@@ -1,0 +1,15 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "An example application",
+  "main": "app.js",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "node ../src/index.js"
+  },
+  "dependencies": {
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
+    "systemjs-nodelibs": "^1.0.0"
+  }
+}

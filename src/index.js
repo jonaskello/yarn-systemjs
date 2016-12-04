@@ -14,7 +14,7 @@
  *   }
  * }
  *
- * We transform it to an internal representation like this
+ * We transform it to an internal registry like this
  * {
  *   "packageA@1.0.10": {
  *     "location": "expected location on disk calculated from deterministic algorithm",
@@ -48,40 +48,27 @@
  * }
  */
 
-const LockFile = require('yarn/lib/lockfile/wrapper.js').default;
-const {convertPackage} = require('jspm-npm/lib/node-conversion');
-const Registry = require('./registry');
-const SystemJsConfig = require('./system-js-config');
+const LockFile = require("./lockfile");
+const Registry = require("./registry");
+const SystemConfig = require("./system-config");
+const PackageConfig = require("./package-config");
+const fs = require("fs");
 
-LockFile.fromDirectory("./").then(handleLockfile).catch((e) => console.log(e));
+main("./");
 
-function handleLockfile(lockfile) {
+function main(lockFileDirectory) {
 
-    // exports.convertPackage = function(packageConfig, packageName, packageDir, ui) {
-
-    const registry = Registry.lockfileToRegistry(lockfile);
-    const configs = buildSystemJsPackageJsonExtensions(registry);
-
-    // Build the final systemjs config
-    const systemjsconfig = {
-        map: SystemJsConfig.buildSystemJsMapSection(registry),
-        packages: SystemJsConfig.buildSystemJsPackagesSection(registry),
-    };
-    console.log(JSON.stringify(systemjsconfig, undefined, 2));
-
+  LockFile.parseLockFile(lockFileDirectory)
+    .then(Registry.lockfileToRegistry)
+    .then((registry) => PackageConfig.buildPackageConfigs(registry)
+      .then((configs) => ({registry, configs})))
+    .then(SystemConfig.buildSystemConfig)
+    .then(writeConfig)
+    .catch((e) => console.log(e));
 }
 
-/**
- * Builds SystemJS config for each package in the given registry
- */
-function buildSystemJsPackageJsonExtensions(registry) {
-
-    // convertPackage(depMap.config, ':' + key, './' + depMap.location, console)
-    //     .then(config => Object.assign(depMap, {config, augmented: true}))
-    //     .catch(log)
-
-    return {};
+function writeConfig(config) {
+  fs.writeFileSync("./generated.config.js", `SystemJS.config(${JSON.stringify(config, null, 2)});`);
 }
-
 
 

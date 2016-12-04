@@ -1,3 +1,6 @@
 .idea
 node_modules/
 *.log
+generated.config.js
+example/generated.config.js
+example/yarn.lock
