@@ -5,7 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "jspm-npm": "^0.30.1",
-    "yarn": "^0.17.10"
+    "yarn": "^1.22.0"
   },
   "scripts": {
     "start": "node src/index.js"
